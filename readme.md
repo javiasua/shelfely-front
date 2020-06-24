@@ -73,7 +73,9 @@ User profile:
   - books.create(data)
   - books.detail(id)
   - books.toList(id)
-  - books.removeFromList(id)   
+  - books.delete(id)
+  - books.edit(data)
+  - books.search(author and/or title)   
 
 # Server
 
