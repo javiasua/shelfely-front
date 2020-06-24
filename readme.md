@@ -33,7 +33,6 @@ User profile:
 - /books/:id - book information (author,title,date etc)
 - /search - search for a book from an external api
 - /profile - my details and favorite books
-- 404
 
 ## Pages
 
