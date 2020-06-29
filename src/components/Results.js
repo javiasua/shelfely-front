@@ -3,54 +3,91 @@ import axios from 'axios'
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card'
-import './Results.scss'
+import { Redirect } from 'react-router-dom';
+import {Link} from 'react-router-dom'
+//import './Results.scss'
 
 export default class Results extends React.Component{
 
     state = {
         books : [],
         open : false,
-        show : false
+        show : false,
+        noInputs : false,
+        noBooksFound : false,
+        showDescription : false
     }
     componentDidMount(){
         let {author,title} = this.props.bookSearched
+        if(!title&&!author){
+            this.setState({
+                noInputs : true 
+            })
+        }else{
+        author = author.split(' ').join('+')
+        title =title.split(' ').join('+')
         console.log(author,title)
-        let axiosString = `https://www.googleapis.com/books/v1/volumes?q=inauthor:${author}+intitle:${title}&key=AIzaSyD1sfSEZsI1Pktogx1OzMt4uDrgjY7oBeo`
+        let axiosString = `https://www.googleapis.com/books/v1/volumes?q=inauthor:${author}+intitle:${title}&maxResults=40&key=AIzaSyD1sfSEZsI1Pktogx1OzMt4uDrgjY7oBeo`
         if(author ===undefined || author ===''){
-            axiosString = `https://www.googleapis.com/books/v1/volumes?q=intitle:${title}&key=AIzaSyD1sfSEZsI1Pktogx1OzMt4uDrgjY7oBeo`
+            axiosString = `https://www.googleapis.com/books/v1/volumes?q=intitle:${title}&maxResults=40&key=AIzaSyD1sfSEZsI1Pktogx1OzMt4uDrgjY7oBeo`
         }
         if(title ===undefined ||title ===''){
-            axiosString = `https://www.googleapis.com/books/v1/volumes?q=inauthor:${author}&key=AIzaSyD1sfSEZsI1Pktogx1OzMt4uDrgjY7oBeo`
+            axiosString = `https://www.googleapis.com/books/v1/volumes?q=inauthor:${author}&maxResults=40&key=AIzaSyD1sfSEZsI1Pktogx1OzMt4uDrgjY7oBeo`
         }
+
 
         console.log(axiosString,'sssss')
         axios.get(axiosString)
         .then((res)=>{
-            console.log(res.data.items)
-            let {title,imageLinks,authors,description,publishedDate,category} = res.data.items[0].volumeInfo
-            let newArray = [{title:title,author:authors[0],image:imageLinks.thumbnail,description:description,publishedDate:publishedDate,category:category,alreadyRead:true}]
-            for(let i=1;i<res.data.items.length;i++){
-                if(res.data.items[i-1].volumeInfo.title!==res.data.items[i].volumeInfo.title){
-                    let title = res.data.items[i].volumeInfo.title
-                    let author = res.data.items[i].volumeInfo.authors[0]
+            console.log(res)
+            if(res.data.totalItems===0){
+               console.log('nothing found') 
+                this.setState({
+                    noBooksFound : true
+                })
+            }else{
+                let newArray = []
+            for(let i=0;i<res.data.items.length;i++){
+                    let title = ''
+                    let author = ''
+                    if(!res.data.items[i].volumeInfo.title ||!res.data.items[i].volumeInfo.authors ){
+                        continue
+                    }else{
+                        title = title = res.data.items[i].volumeInfo.title
+                        author = res.data.items[i].volumeInfo.authors[0]
+                    }
                     let image =''
                     let category = ''
                     if(res.data.items[i].volumeInfo.imageLinks===undefined){
                       continue    
                     }else{
-                        image=res.data.items[i].volumeInfo.imageLinks.smallThumbnail
+                        image=res.data.items[i].volumeInfo.imageLinks.thumbnail
                     }
-                     let publishedDate = res.data.items[i].volumeInfo.publishedDate
+                    let publishedDate = ''
+                    if(!res.data.items[i].volumeInfo.publishedDate){
+                        continue
+                    }else{
+                         publishedDate = res.data.items[i].volumeInfo.publishedDate
+                    }
 
                      if(res.data.items[i].volumeInfo.categories===undefined){
                         continue    
                       }else{
                           category=res.data.items[i].volumeInfo.categories[0]
                       }
-                    
-                     let description = res.data.items[i].volumeInfo.description
-                    newArray.push({title:title,image:image,author:author, description:description,publishedDate:publishedDate,category:category,alreadyRead:true})
-                }
+                      let description = ''
+                      if(!res.data.items[i].volumeInfo.description){
+                          continue
+                      }else{
+                         description = res.data.items[i].volumeInfo.description
+                      }
+                      let preview = ''
+                      if(!res.data.items[i].volumeInfo.previewLink){
+                          continue
+                      }else{
+                          preview = res.data.items[i].volumeInfo.previewLink
+                      }
+                    newArray.push({title:title,image:image,author:author, description:description,publishedDate:publishedDate,category:category,preview:preview,alreadyRead:true,wordForDescriptionButton:'Show',showDescription:false})
             }
             Promise.all(newArray)
                 .then((res)=>{
@@ -58,10 +95,14 @@ export default class Results extends React.Component{
                         books : res
                     })
                 })
+            }
+            
+            
         })
         .catch((err)=>{
             console.log('book not found',err)
         })
+        }
     }
 
     setShow = (value, index) => {
@@ -91,94 +132,62 @@ export default class Results extends React.Component{
         })
         this.props.addToBookList(elemToSend[0])
     }
+
+    handleDescription=(value,index)=>{
+        let booksClone = [...this.state.books]
+        booksClone[index].showDescription = value
+        booksClone[index].wordForDescriptionButton = booksClone[index].showDescription?'Minimize':'Show'
+        this.setState({
+            books: booksClone,
+            description : 'Minimize'
+        })
+    }
     
     render(){
+        console.log(this.state.books)
+        if(this.state.noInputs){
+            return(
+                <Redirect to='/search'/>
+            )
+        }
+        if(this.state.noBooksFound){
+            return(
+                <h1>Nothing found! <Link to='/search'>Try Again</Link></h1>
+            )
+        }
         return(
             <>
+                <div className='results'>
                 {
                     this.state.books.map((elem,index)=>{
                         elem.inBookList=false;
                         elem.urlForResults = `url(${elem.image})`
                         return(
-                            <div key={index}>
-                            {/* //    <header>
-                            //     <h1>{elem.title}</h1>
-                            //     </header>
-                            //     <div class="band">
-                            //     <div class="item-1">
-                            //         <a href="https://design.tutsplus.com/articles/international-artist-feature-malaysia--cms-26852" class="card">
-                            //         <div class="thumb" style={{backgroundImage: elem.urlForResults}}></div>
-                            //         <article>
-                            //             <h1>{elem.title}</h1>
-                            //             <span>{elem.author}</span>
-                            //         </article>
-                            //         </a>
-                            //     </div> */}
-                                {/* <div class="item-2">
-                                    <a href="https://webdesign.tutsplus.com/articles/how-to-conduct-remote-usability-testing--cms-27045" class="card">
-                                    <div class="thumb" style={{backgroundImage: 'url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/users-2.png)'}}></div>
-                                    <article>
-                                        <h1>How to Conduct Remote Usability Testing</h1>
-                                        <span>Harry Brignull</span>
-                                    </article>
-                                    </a>
-                                </div> */}
-                                {/* <div class="item-3">
-                                    <a href="https://design.tutsplus.com/articles/envato-tuts-community-challenge-created-by-you-july-edition--cms-26724" class="card">
-                                    <div class="thumb" style={{backgroundImage: 'url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/flex-5.jpg)'}}></div>
-                                    <article>
-                                        <h1>Created by You, July Edition</h1>
-                                        <p>Welcome to our monthly feature of fantastic tutorial results created by you, the Envato Tuts+ community! </p>
-                                        <span>Melody Nieves</span>
-                                    </article>
-                                    </a>
-                                </div>
-                                <div class="item-4">
-                                    <a href="https://webdesign.tutsplus.com/tutorials/how-to-code-a-scrolling-alien-lander-website--cms-26826" class="card">
-                                    <div class="thumb" style={{backgroundImage: 'url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/landing.png)'}}></div>
-                                    <article>
-                                        <h1>How to Code a Scrolling “Alien Lander” Website</h1>
-                                        <p>We’ll be putting things together so that as you scroll down from the top of the page you’ll see an “Alien Lander” making its way to touch down.</p>
-                                        <span>Kezz Bracey</span>
-                                    </article>
-                                    </a>
-                                </div>
-                                <div class="item-5">
-                                    <a href="https://design.tutsplus.com/tutorials/stranger-things-inspired-text-effect--cms-27139" class="card">
-                                    <div class="thumb" style={{backgroundImage: 'url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/strange.jpg)'}}></div>
-                                    <article>
-                                        <h1>How to Create a “Stranger Things” Text Effect in Adobe Photoshop</h1>
-                                        <span>Rose</span>
-                                    </article>
-                                    </a>
-                                </div>
-                                <div class="item-6">
-                                    <a href="https://photography.tutsplus.com/articles/5-inspirational-business-portraits-and-how-to-make-your-own--cms-27338" class="card">
-                                    <div class="thumb" style={{backgroundImage: 'url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/flor.jpg)'}}></div>
-                                    <article>
-                                        <h1>5 Inspirational Business Portraits and How to Make Your Own</h1>
-
-                                        <span>Marie Gardiner</span>
-                                    </article>
-                                    </a>
-                                </div>
-                                <div class="item-7">
-                                    <a href="https://webdesign.tutsplus.com/articles/notes-from-behind-the-firewall-the-state-of-web-design-in-china--cms-22281" class="card">
-                                    <div class="thumb" style={{backgroundImage: 'url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/china.png)'}}></div>
-                                    <article>
-                                        <h1>Notes From Behind the Firewall: The State of Web Design in China</h1>
-                                        <span>Kendra Schaefer</span>
-                                    </article>
-                                    </a>
-                                </div> */}
-                                {/* </div> */}
+                            <div  key={index}>
                                 <Card style={{ width: '14rem' }}>
                                 <Card.Img variant="top" src={elem.image} />
                                 <Card.Body>
                                     <Card.Title>{elem.title}</Card.Title>
                                     <Card.Text>Author: {elem.author}</Card.Text>
                                     <Card.Text>
-                                     <textarea>{elem.description}</textarea>
+                                    <a target="_blank" href={elem.preview}>Preview of the book</a>
+                                    <button style={{display:'block',width:'100%',border:'none'}}onClick={()=>{this.handleDescription(true,index)}}>{elem.wordForDescriptionButton} Description</button>
+                                    {
+                                        elem.showDescription ? 
+                                        <Modal show={elem.showDescription} onHide={()=>{this.handleDescription(false,index)}}>
+                                        <Modal.Header closeButton>
+                                        <Modal.Title>{elem.title} </Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                                <textarea style={{border:'none' ,fontFamily:'Helvetica',color:'rgba(200, 130, 150, 1)'}} rows='10' cols='50'>{elem.description}</textarea>
+                                        </Modal.Body>
+                                        <Modal.Footer>
+        
+                                        </Modal.Footer>
+                                        </Modal> 
+                                        :''
+                                    }
+                                     
                                     </Card.Text>
                                     {   
                                         this.props.books.map((elem1)=>{
@@ -189,9 +198,9 @@ export default class Results extends React.Component{
                                     }
                                     {
                                         
-                                        elem.inBookList?<h3>Already in BookList</h3>:
+                                        elem.inBookList?<h3 style={{margin:'0',padding:'1px',color:'green', borderRadius: '5px'}}>In BookList ✓</h3>:
                                         <>
-                                        <Button variant="primary" onClick={()=>{this.setShow    (true, index)}}>
+                                        <Button style={{display:'block',width:'100%'}} variant="primary" onClick={()=>{this.setShow    (true, index)}}>
                                         Add to book List
                                         </Button>
                                         {
@@ -226,11 +235,12 @@ export default class Results extends React.Component{
                                 
                                 
                             
-                            </div>
+                                </div>
                             
                         )
                     })
                 }
+                </div>
             </>             
         )
     }

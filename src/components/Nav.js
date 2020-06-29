@@ -6,30 +6,39 @@ export default class Nav extends React.Component{
     render(){
         return(
             <>
+             <div className='logout'>
+            <button  type="button" onClick={this.props.onLogout}>Logout</button>
+            </div>
             <nav class="nav">
-                <Link class="nav-link active" to="/">My books</Link>
-                <Link class="nav-link" to="/add-book">Add New Book</Link>
+                <ul>
+                <li>
+                <Link className='links' to="/">MY BOOKS</Link>
+                </li>
+                <li>
+                <Link className='links' to="/add-book">ADD BOOK</Link>
+                </li>
                 {
                     this.props.loggedInUser ? (
                         <>
-                        <li className="nav-item">
-                                <button className="nav-link" onClick={this.props.onLogout}>Logout</button>
+                        <li>
+                            <Link className='links' to='/search'>SEARCH BOOKS</Link>
                         </li>
-                        <button><Link to='/search'>Search for a book</Link></button>
                         </>
+                       
                     ) : (
                         <>
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/sign-in">SignIn</Link>
+                            <li >
+                                <Link className='links' to="/sign-in">SIGNIN</Link>
                             </li>
-                            <li className="nav-item">
-                                <Link className="nav-link" to="/sign-up">SignUp</Link>
+                            <li >
+                                <Link className='links' to="/sign-up">SIGNUP</Link>
                             </li>
                         </>
                     )
                 }
+                </ul>
             </nav>
-            </>
+             </>
         )
     }
 } 

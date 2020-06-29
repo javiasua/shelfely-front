@@ -1,0 +1,22 @@
+{
+                    this.props.loggedInUser ? (
+                        <>
+                        <li >
+                                <button className="nav-link" onClick={this.props.onLogout}>Logout</button>
+                        </li>
+                        <li>
+                        <button><Link to='/search'>Search for a book</Link></button>
+                        </li>
+                        </>
+                       
+                    ) : (
+                        <>
+                            <li >
+                                <Link className="nav-link" to="/sign-in">SignIn</Link>
+                            </li>
+                            <li >
+                                <Link className="nav-link" to="/sign-up">SignUp</Link>
+                            </li>
+                        </>
+                    )
+                }

@@ -53,7 +53,7 @@ export default class BookList extends React.Component{
             return(
                 <>
                 <div class="dropdown">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button  style={{margin:'15px'}} class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                          {this.state.filterBy}
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -147,7 +147,7 @@ export default class BookList extends React.Component{
                             return (
                                 <tr key = {index}>
                                     <td>
-                                    <img src={book.image}/>
+                                    <img style={{width:'140px' ,height:'170px'}} src={book.image}/>
                                     </td>
                                     <td>
                                     <Link to={`/book/${book._id}`}class="card-text"><h3>{book.title}</h3></Link>

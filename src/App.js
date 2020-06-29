@@ -224,9 +224,11 @@ class App extends React.Component{
     console.log('user is ',loggedInUser)
     return (
         <>
-          
+  
+          <header className='main-header'>
           <Nav loggedInUser={loggedInUser} onLogout={this.handleLogout} searchBooks = {this.handleSearchBooks}/>
-          <header><h1><Link to='/'>Shelfely</Link></h1></header>
+          <h1> <Link className='main-title' to='/'>SHELFELY</Link></h1>
+          </header>
           <Switch>
 
             <Route exact path='/' render={()=> {
