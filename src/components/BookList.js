@@ -42,24 +42,21 @@ export default class BookList extends React.Component{
         if(!this.props.loggedInUser){
             return(
                 <>
-                {/* <div class="spinner-grow" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div> */}
-                <h1>Please sign in to start using Shelfely</h1>
+                <h1 style={{color:'white',textAlign:'center',margin:'50px',padding:'20px'}}className='myDetail'>Please sign in to start using Shelfely</h1>
                 </>
             )
         }
         if(this.state.allBooks){
             return(
                 <>
-                <div class="dropdown">
-                    <button  style={{margin:'15px'}} class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="myDetail dropdown">
+                    <button   class="filterByButton dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"  aria-expanded="false">
                          {this.state.filterBy}
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <button type='submit' onClick={this.handleAllBooks} class="dropdown-item" >All Books</button>
+                        <button className='dropdown-item' type='submit' onClick={this.handleAllBooks} >All Books</button>
                         <button type='submit' onClick={this.handleReadDropDown} class="dropdown-item" >Already Read</button>
-                        <button class="dropdown-item" type='submit' onClick={this.handleToReadDropDown} >Wish To-Read</button>
+                        <button class="dropdown-item" type='submit' onClick={this.handleToReadDropDown} >WishList</button>
                     </div>
                 </div>
                 <table class="table">
@@ -80,7 +77,7 @@ export default class BookList extends React.Component{
                             return (
                                 <tr key = {index}>
                                     <td>
-                                    <img style={{width:'140px' ,height:'170px'}} src={book.image}/>
+                                    <img style={{width:'100px' ,height:'120px'}} src={book.image}/>
                                     </td>
                                     <td>
                                     <Link to={`/book/${book._id}`}class="card-text"><h3>{book.title}</h3></Link>
@@ -97,11 +94,11 @@ export default class BookList extends React.Component{
                                     {
                                         book.alreadyRead ? 
                                         <td>
-                                            <h4>Yes</h4>
+                                            <h4>✅</h4>
                                         </td>
                                         :
                                         <td>
-                                            <h4>Pending</h4>
+                                            <h4><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4>
                                         </td>
                                     }
                                 </tr>
@@ -117,15 +114,15 @@ export default class BookList extends React.Component{
         }
         return (
             <>
-                <div class="dropdown">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="myDetail dropdown">
+                    <button class=" filterByButton dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {this.state.filterBy}
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         
                         <button type='submit' onClick={this.handleAllBooks} class="dropdown-item" >All Books</button>
                         <button type='submit' onClick={this.handleReadDropDown} class="dropdown-item" >Already Read</button>
-                        <button class="dropdown-item" type='submit' onClick={this.handleToReadDropDown} >Wish To-Read</button>
+                        <button class="dropdown-item" type='submit' onClick={this.handleToReadDropDown} >WishList</button>
                         
                     </div>
 
@@ -164,11 +161,11 @@ export default class BookList extends React.Component{
                                     {
                                         book.alreadyRead ? 
                                         <td>
-                                            <h4>Yes</h4>
+                                            <h4>✅</h4>
                                         </td>
                                         :
                                         <td>
-                                            <h4>Pending</h4>
+                                            <h4><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4>
                                         </td>
                                     }
                                 </tr>

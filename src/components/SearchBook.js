@@ -12,26 +12,17 @@ export default class SearchBook extends React.Component{
     render(){
         return(
             <>
-            {/* <div className='search-bar'>
-
-            
-            <form onSubmit={this.props.handleSearch}>
-                    <label htmlFor='title'>Title:</label>
-                    <input id='title' name='title'></input>
-                    <label htmlFor='author'>Author:</label>
-                    <input id='author' name='author'></input>
-                    <button type='submit'> Search </button>
-            </form> */}
+            <div class='search-box'>
             <div class="login-box">
             <h2>Search</h2>
             <form onSubmit={this.props.handleSearch}>
                 <div class="user-box">
                 <input type="text" name="title" required=""/>
-                <label>Title</label>
+                <label style={{color:'white'}}>Title</label>
                 </div>
                 <div class="user-box">
                 <input type="text" name="author" required=""/>
-                <label>Author</label>
+                <label style={{color:'white'}}>Author</label>
                 </div>
                 <div class="search-buttons">
                 <div class="container">
@@ -40,6 +31,7 @@ export default class SearchBook extends React.Component{
                 </div>
 
             </form>
+            </div>
             </div>
             {/* </div> */}
             </>

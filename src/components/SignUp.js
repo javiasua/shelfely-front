@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function SignUp(props){
     return (
-        <form onSubmit={props.onSignUp}>
+        <form className='myDetail' onSubmit={props.onSignUp}>
             <div className="form-group">
                 <label htmlFor="exampleInputUsername">Username</label>
                 <input type="text" className="form-control" id="exampleInputUsername" name="username" />

@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 
 export default function SignIn(props){
     return (
-        <form onSubmit={props.onSignIn}>
+        <form className='myDetail'onSubmit={props.onSignIn}>
             <div className="form-group">
                 <label htmlFor="exampleInputEmail1">Email address</label>
                 <input type="email" className="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" />

@@ -144,6 +144,9 @@ export default class Results extends React.Component{
     }
     
     render(){
+        if (!this.props.loggedInUser) {
+            return <Redirect to='/sign-in' />
+        }
         console.log(this.state.books)
         if(this.state.noInputs){
             return(
@@ -152,34 +155,35 @@ export default class Results extends React.Component{
         }
         if(this.state.noBooksFound){
             return(
-                <h1>Nothing found! <Link to='/search'>Try Again</Link></h1>
+                <h1 className='myDetail' style={{textAlign:'center', color:'brown'}}>Nothing found! <Link to='/search'>Try Again</Link></h1>
             )
         }
         return(
-            <>
-                <div className='results'>
+            <>  
+                <span  style={{backgroundColor:'rgba(42, 187, 155, 0.5)',padding:'10px',margin: '10px',fontSize:'40px',fontFamily:'Kameron',color:'white'}}>{this.state.books.length} books found...</span>
+                <div className='myDetail results'>
                 {
                     this.state.books.map((elem,index)=>{
                         elem.inBookList=false;
                         elem.urlForResults = `url(${elem.image})`
                         return(
                             <div  key={index}>
-                                <Card style={{ width: '14rem' }}>
-                                <Card.Img variant="top" src={elem.image} />
+                                <Card style={{ width: '14rem', height:'550px',margin:'20px' }}>
+                                <Card.Img variant="top" style={{width:'100%',height:'40%'}}src={elem.image} />
                                 <Card.Body>
                                     <Card.Title>{elem.title}</Card.Title>
                                     <Card.Text>Author: {elem.author}</Card.Text>
                                     <Card.Text>
-                                    <a target="_blank" href={elem.preview}>Preview of the book</a>
+                                    <a target="_blank" href={elem.preview}>PREVIEW</a>
                                     <button style={{display:'block',width:'100%',border:'none'}}onClick={()=>{this.handleDescription(true,index)}}>{elem.wordForDescriptionButton} Description</button>
                                     {
                                         elem.showDescription ? 
                                         <Modal show={elem.showDescription} onHide={()=>{this.handleDescription(false,index)}}>
-                                        <Modal.Header closeButton>
-                                        <Modal.Title>{elem.title} </Modal.Title>
+                                        <Modal.Header  closeButton>
+                                        <Modal.Title style={{fontFamily:'Kameron'}}>{elem.title} </Modal.Title>
                                         </Modal.Header>
-                                        <Modal.Body>
-                                                <textarea style={{border:'none' ,fontFamily:'Helvetica',color:'rgba(200, 130, 150, 1)'}} rows='10' cols='50'>{elem.description}</textarea>
+                                        <Modal.Body >
+                                                <textarea style={{border:'none' ,fontFamily:'Helvetica',color:'#0C374D'}} rows='10' cols='50'>{elem.description}</textarea>
                                         </Modal.Body>
                                         <Modal.Footer>
         
@@ -200,31 +204,40 @@ export default class Results extends React.Component{
                                         
                                         elem.inBookList?<h3 style={{margin:'0',padding:'1px',color:'green', borderRadius: '5px'}}>In BookList ✓</h3>:
                                         <>
-                                        <Button style={{display:'block',width:'100%'}} variant="primary" onClick={()=>{this.setShow    (true, index)}}>
-                                        Add to book List
-                                        </Button>
+                                        {/* <Button  onClick={()=>{this.setShow(true, index)}}>
+                                        ADD BOOK
+                                        </Button> */}
+                                        {/* <div class="container addSearchButton"> */}
+                                        <button type='submit'href="https://twitter.com/masuwa1018"  onClick={()=>{this.setShow(true, index)}}class="btn effect01" target="_blank"><span>ADD BOOK</span></button>
+                                        {/* </div> */}
                                         {
                                         elem.show && (
                                         <Modal show={elem.show} onHide={()=>{this.setShow(false,index)}}>
                                         <Modal.Header closeButton>
                                         <Modal.Title>Choose a BookShelf</Modal.Title>
                                         </Modal.Header>
+                                        <form onSubmit={this.handleModal}>
                                         <Modal.Body>
-                                                <form onSubmit={this.handleModal}>
+                                                <h3>Did you read it already?</h3>
                                                 <select name ='yes'class="custom-select" id="inputGroupSelect01">
                                                     <option selected>Choose...</option>
                                                     <option value='yes'>Yes</option>
-                                                    <option value="no">Not yet, but I want to!</option>
+                                                    <option value="no">Not yet, add to my WishList!</option>
                                                 </select>
                                                 <input hidden name='book' value={elem.title}></input>
-                                                <button type='submit'>Save changes</button>
-                                                </form>
+                                                
                                         </Modal.Body>
+                                        
                                         <Modal.Footer>
+                                        <div class="container">
+                                             <button type='submit'href="https://twitter.com/masuwa1018" class="btn effect01" target="_blank"><span>ADD</span></button>
+                
+                                        </div>
                                         <Button variant="secondary" onClick={()=>{this.setShow(false, index)}}>
                                         Close
                                         </Button>
                                         </Modal.Footer>
+                                        </form>
                                         </Modal> 
                                      )
                                     }

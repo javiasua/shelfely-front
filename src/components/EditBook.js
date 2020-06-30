@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import {Redirect} from 'react-router-dom'
+import API_URL from '../config'
 export default class EditBook extends React.Component{
 
     state = {
@@ -9,7 +10,7 @@ export default class EditBook extends React.Component{
 
     componentDidMount(){
         let id = this.props.match.params.id
-        axios.get(`http://localhost:5000/api/books/${id}`)
+        axios.get(`${API_URL}/books/${id}`)
             .then((res)=>{
                 console.log(res.data)
                 let bookToEdit = res.data
@@ -20,21 +21,22 @@ export default class EditBook extends React.Component{
             })
     }
 
-    handleEdit=()=>{
+    handleEdit=(e)=>{
+        e.preventDefault()
         let id = this.props.match.params.id
         let {title,author,date,description} = this.state.book
         console.log(description)
-        axios.patch(`http://localhost:5000/api/books/${id}`,{
+        let properties = {title:title,author:author,date:date,description:description}
+        axios.patch(`${API_URL}/books/${id}`,{
             title : title,
             author : author,
             date : date,
             description : description
         })
             .then((res)=>{
-                this.props.history.push('/');
-                
+                this.props.edit(id,properties);
             })
-        this.props.history.push(`/books/${id}`);
+        // this.props.history.push(`/`);
     }
 
     handleAuthorChange=(e)=>{
@@ -78,28 +80,36 @@ export default class EditBook extends React.Component{
     }
 
     render(){
-        const {title,author,date,description} = this.state.book
+        const {title,author,date,image,description} = this.state.book
         return (
             <>
-                <form onSubmit={this.props.handleEdit}>
+                <div className='add1-book'>
+                <img style={{margin:'20px', height:'589px'}}src={image}></img>
+                <form className='edit-book myDetail' onSubmit={this.props.handleEdit}>
                     <div class="form-group">
-                        <label for="title">Title</label>
+                        <label className='my-labels'for="title">Title</label>
                         <input onChange={this.handleTitleChange}name='title'type="text" class="form-control" id="title" aria-describedby="emailHelp" value = {title} />
                     </div>
                     <div class="form-group">
-                        <label for="author">Author</label>
+                        <label  className='my-labels' for="author">Author</label>
                         <input onChange={this.handleAuthorChange} name ='author' type="text" class="form-control" id="author" value={author}/>
                     </div>
                     <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea onChange={this.handleDescriptionChange} name ='description' class="form-control" id="desription" value={description} rows='6' cols='10'/>
+                        <label   className='my-labels'for="description">Description</label>
+                        <textarea onChange={this.handleDescriptionChange} name ='description' class="form-control" id="desription" value={description} rows='5' cols='10'/>
                     </div>
                     <div class="form-group">
-                        <label for="date">Date (Input needs to be valid date)</label>
+                        <label  className='my-labels' for="date">Date (Input needs to be valid date)</label>
                         <input onChange={this.handleDateChange}name ='date' type="text" class="form-control" id="date" value={date}/>
                     </div>
-                    <button  onClick={this.handleEdit}   type="submit" class="btn btn-primary">Submit</button>
+                    {/* <button  onClick={this.handleEdit}   type="submit" class="edit-button">EDIT</button> */}
+
+                    <div class="container">
+                    <button type='submit'href="https://twitter.com/masuwa1018"  onClick={this.handleEdit} class="btn effect01" target="_blank"><span>EDIT</span></button>
+                    </div>
                 </form>
+                <img style={{margin:'20px', height:'589px'}}src={image}></img>
+                </div>
             </>
         )
     }

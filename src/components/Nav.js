@@ -11,15 +11,15 @@ export default class Nav extends React.Component{
             </div>
             <nav class="nav">
                 <ul>
-                <li>
-                <Link className='links' to="/">MY BOOKS</Link>
-                </li>
-                <li>
-                <Link className='links' to="/add-book">ADD BOOK</Link>
-                </li>
                 {
                     this.props.loggedInUser ? (
                         <>
+                        <li>
+                        <Link className='links' to="/">MY BOOKS</Link>
+                        </li>
+                        <li>
+                        <Link className='links' to="/add-book">ADD BOOK</Link>
+                        </li>
                         <li>
                             <Link className='links' to='/search'>SEARCH BOOKS</Link>
                         </li>

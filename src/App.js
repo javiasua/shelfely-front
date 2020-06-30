@@ -15,6 +15,7 @@ import SignUp from './components/SignUp';
 import SearchBook from './components/SearchBook';
 import Results from './components/Results'
 import {Link} from 'react-router-dom'
+import API_URL from './config'
 
 class App extends React.Component{
 
@@ -25,11 +26,14 @@ class App extends React.Component{
   }
 
   getBooks = () => {
-    axios.get(`http://localhost:5000/api/books`)
+    axios.get(`${API_URL}/books`)
       .then((res) => {
         for(let i = 0 ; i<res.data.length ; i++){
-          console.log(res.data[i].date)
-          res.data[i].date = res.data[i].date.substring(0,10)
+          if(!res.data[i].date){
+            res.data[i].date = 'no date available'
+          }else{
+            res.data[i].date = res.data[i].date.substring(0,10)
+          }
         }
         console.log(res.data)
         this.setState({
@@ -42,7 +46,7 @@ class App extends React.Component{
   }
 
   getUser(){
-    axios.get(`http://localhost:5000/api/user`, {withCredentials: true})
+    axios.get(`${API_URL}/user`, {withCredentials: true})
     .then((res) => {
       this.setState({
         loggedInUser: res.data
@@ -56,7 +60,7 @@ class App extends React.Component{
   }
 
   componentDidMount(){
-    axios.get('http://localhost:5000/api/books')
+    axios.get(`${API_URL}/books`)
       .then((res)=>{
         this.setState({
           books : res.data
@@ -74,7 +78,7 @@ class App extends React.Component{
     let email = e.target.email.value;
     let password = e.target.password.value
     
-    axios.post(`http://localhost:5000/api/signin`, {
+    axios.post(`${API_URL}/signin`, {
       email: email,
       password: password
     }, {withCredentials: true})
@@ -92,7 +96,7 @@ class App extends React.Component{
     let email = e.target.email.value;
     let username = e.target.username.value
     let password = e.target.password.value
-    axios.post(`http://localhost:5000/api/signup`, {
+    axios.post(`${API_URL}/signup`, {
       email: email,
       username: username,
       password: password
@@ -108,7 +112,7 @@ class App extends React.Component{
 
   handleLogout = () => {
     console.log(document.cookie)
-    axios.post(`http://localhost:5000/api/logout`, {}, { withCredentials: true})
+    axios.post(`${API_URL}/logout`, {}, { withCredentials: true})
     .then((res) => {
       console.log(res)
       this.setState({
@@ -133,10 +137,10 @@ class App extends React.Component{
     let description= e.target.description.value
     let category = e.target.category.value
     let alreadyRead = e.target.yes.value==='yes'? true : false
-    axios.post('http://localhost:5000/api/upload',uploadData)
+    axios.post(`${API_URL}/upload`,uploadData)
       .then((res)=>{
           console.log(res,'heo')
-            axios.post('http://localhost:5000/api/create',{
+            axios.post(`${API_URL}/creae`,{
           title : title,
           author : author,
           date : date,
@@ -165,8 +169,9 @@ class App extends React.Component{
     let date = book.publishedDate
     let category = book.category
     let alreadyRead = book.alreadyRead
+    let preview = book.preview
     console.log(book.alreadyRead)
-    axios.post('http://localhost:5000/api/create',{
+    axios.post(`${API_URL}/create`,{
       title : title,
       author : author,
       date : date,
@@ -174,6 +179,7 @@ class App extends React.Component{
       description:description,
       alreadyRead:alreadyRead,
       category : category,
+      preview : preview,
       id : this.state.loggedInUser._id
     },{withCredentials: true})
     .then((res)=>{
@@ -216,6 +222,25 @@ class App extends React.Component{
 
   }
 
+  handleEdit=(id,properties)=>{
+    let {title,author,date,description} = properties
+    let newBooks = [...this.state.books]
+    let index = newBooks.findIndex((e)=>{
+      return e._id === id 
+    })
+
+    newBooks[index].title = title
+    newBooks[index].author=author
+    newBooks[index].description=description
+    newBooks[index].date=date
+
+    this.setState({
+      books: newBooks
+    },()=>{
+      this.props.history.push('/')
+    })
+  }
+
   
 
 
@@ -242,7 +267,7 @@ class App extends React.Component{
               return <BookDetail afterDelete ={this.handleDelete} {...routeProps} /> }}/>
 
             <Route path='/book/:id/edit' render={(routeProps)=>{
-              return <EditBook  {...routeProps} /> }}/>
+              return <EditBook edit={this.handleEdit} {...routeProps} /> }}/>
 
             <Route path="/sign-in" render={(routeProps) => {
                   return <SignIn 
