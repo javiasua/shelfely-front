@@ -20,3 +20,7 @@
                         </>
                     )
                 }
+
+
+
+                style={{marginBottom:'0.75rem',fontWeight:'500',width:'100%',fontSize:'1.25rem',backgroundColor:'white',color:'black',padding:'0',border:'none'}}

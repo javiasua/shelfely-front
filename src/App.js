@@ -15,7 +15,7 @@ import SignUp from './components/SignUp';
 import SearchBook from './components/SearchBook';
 import Results from './components/Results'
 import {Link} from 'react-router-dom'
-import API_URL from './config'
+import config from './config'
 
 class App extends React.Component{
 
@@ -26,7 +26,7 @@ class App extends React.Component{
   }
 
   getBooks = () => {
-    axios.get(`${API_URL}/books`)
+    axios.get(`${config.API_URL}/books`)
       .then((res) => {
         for(let i = 0 ; i<res.data.length ; i++){
           if(!res.data[i].date){
@@ -46,7 +46,7 @@ class App extends React.Component{
   }
 
   getUser(){
-    axios.get(`${API_URL}/user`, {withCredentials: true})
+    axios.get(`${config.API_URL}/user`, {withCredentials: true})
     .then((res) => {
       this.setState({
         loggedInUser: res.data
@@ -60,7 +60,7 @@ class App extends React.Component{
   }
 
   componentDidMount(){
-    axios.get(`${API_URL}/books`)
+    axios.get(`${config.API_URL}/books`)
       .then((res)=>{
         this.setState({
           books : res.data
@@ -78,7 +78,7 @@ class App extends React.Component{
     let email = e.target.email.value;
     let password = e.target.password.value
     
-    axios.post(`${API_URL}/signin`, {
+    axios.post(`${config.API_URL}/signin`, {
       email: email,
       password: password
     }, {withCredentials: true})
@@ -96,7 +96,7 @@ class App extends React.Component{
     let email = e.target.email.value;
     let username = e.target.username.value
     let password = e.target.password.value
-    axios.post(`${API_URL}/signup`, {
+    axios.post(`${config.API_URL}/signup`, {
       email: email,
       username: username,
       password: password
@@ -108,11 +108,14 @@ class App extends React.Component{
           this.props.history.push('/')
         })
     })
+    .catch((err)=>{
+      console.log(err)
+    })
   }
 
   handleLogout = () => {
     console.log(document.cookie)
-    axios.post(`${API_URL}/logout`, {}, { withCredentials: true})
+    axios.post(`${config.API_URL}/logout`, {}, { withCredentials: true})
     .then((res) => {
       console.log(res)
       this.setState({
@@ -137,13 +140,13 @@ class App extends React.Component{
     let description= e.target.description.value
     let category = e.target.category.value
     let alreadyRead = e.target.yes.value==='yes'? true : false
-    axios.post(`${API_URL}/upload`,uploadData)
+    axios.post(`${config.API_URL}/upload`,uploadData)
       .then((res)=>{
           console.log(res,'heo')
-            axios.post(`${API_URL}/creae`,{
+            axios.post(`${config.API_URL}/create`,{
           title : title,
           author : author,
-          date : date,
+          date : date.substring(0,10),
           image : res.data.image,
           description : description,
           alreadyRead  : alreadyRead,
@@ -151,6 +154,7 @@ class App extends React.Component{
           id : this.state.loggedInUser._id
         },{withCredentials: true})
         .then((res)=>{
+          res.data.date = res.data.date.substring(0,10)
           this.setState({
             books : [...this.state.books,res.data]
           }, ()=>{
@@ -166,12 +170,12 @@ class App extends React.Component{
     let author = book.author
     let image = book.image
     let description = book.description
-    let date = book.publishedDate
+    let date = book.publishedDate.substring(0,10)
     let category = book.category
     let alreadyRead = book.alreadyRead
     let preview = book.preview
     console.log(book.alreadyRead)
-    axios.post(`${API_URL}/create`,{
+    axios.post(`${config.API_URL}/create`,{
       title : title,
       author : author,
       date : date,
@@ -183,6 +187,7 @@ class App extends React.Component{
       id : this.state.loggedInUser._id
     },{withCredentials: true})
     .then((res)=>{
+       res.data.date = res.data.date.substring(0,10)
       this.setState({
         books : [...this.state.books,res.data]
       }, ()=>{

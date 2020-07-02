@@ -3,6 +3,8 @@ import axios from 'axios'
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card'
+import Popover from 'react-bootstrap/Popover'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import { Redirect } from 'react-router-dom';
 import {Link} from 'react-router-dom'
 //import './Results.scss'
@@ -160,7 +162,7 @@ export default class Results extends React.Component{
         }
         return(
             <>  
-                <span  style={{backgroundColor:'rgba(42, 187, 155, 0.5)',padding:'10px',margin: '10px',fontSize:'40px',fontFamily:'Kameron',color:'white'}}>{this.state.books.length} books found...</span>
+                <span  style={{backgroundColor:'rgba(42, 187, 155, 0.95)',padding:'7px',fontSize:'40px',fontFamily:'Kameron',color:'white'}}>{this.state.books.length} books found...</span>
                 <div className='myDetail results'>
                 {
                     this.state.books.map((elem,index)=>{
@@ -168,14 +170,34 @@ export default class Results extends React.Component{
                         elem.urlForResults = `url(${elem.image})`
                         return(
                             <div  key={index}>
-                                <Card style={{ width: '14rem', height:'550px',margin:'20px' }}>
-                                <Card.Img variant="top" style={{width:'100%',height:'40%'}}src={elem.image} />
-                                <Card.Body>
-                                    <Card.Title>{elem.title}</Card.Title>
-                                    <Card.Text>Author: {elem.author}</Card.Text>
-                                    <Card.Text>
-                                    <a target="_blank" href={elem.preview}>PREVIEW</a>
-                                    <button style={{display:'block',width:'100%',border:'none'}}onClick={()=>{this.handleDescription(true,index)}}>{elem.wordForDescriptionButton} Description</button>
+                                <Card style={{ width: '17rem', height:'460px',margin:'20px' }}>
+                                <Card.Img variant="top" style={{width:'100%',height:'265px'}}src={elem.image} />
+                                <Card.Body className='card-body'style={{padding:'0'}}>
+                                    {
+                                        (elem.title.length<21)? <Card.Title className='card-components'style={{textAlign:'center',width:'100%',}}>{elem.title}</Card.Title>:
+                                        <>
+                                        <OverlayTrigger
+                                        trigger="click"
+                                        key='right'
+                                        placement='right'
+                                        overlay={
+                                            <Popover id={`popover-positioned-right`}>
+                                            <Popover.Title as="h3">Title</Popover.Title>
+                                            <Popover.Content>
+                                                <strong>{elem.title}</strong>
+                                            </Popover.Content>
+                                            </Popover>
+                                        }
+                                        >
+                                        <button style={{padding:'0',backgroundColor:'white',border:'none'}}><Card.Title className='card-components' style={{textAlign:'center',width:'100%',}}>{elem.title.substring(0,21)+'...'}</Card.Title></button>
+                                        </OverlayTrigger>
+                                        </>
+                                    }
+                                    
+                                    <Card.Text style={{width:'100%',textAlign:'center'}}>{elem.author}</Card.Text>
+                                    <Card.Text className='card-text card-components'>
+                                    <a target="_blank" className='card-components' style={{display:'block',textAlign:'center'}}href={elem.preview}>PREVIEW</a>
+                                    <button style={{display:'block',width:'100%'}}onClick={()=>{this.handleDescription(true,index)}}>{elem.wordForDescriptionButton} Description</button>
                                     {
                                         elem.showDescription ? 
                                         <Modal show={elem.showDescription} onHide={()=>{this.handleDescription(false,index)}}>
@@ -202,13 +224,13 @@ export default class Results extends React.Component{
                                     }
                                     {
                                         
-                                        elem.inBookList?<h3 style={{margin:'0',padding:'1px',color:'green', borderRadius: '5px'}}>In BookList ✓</h3>:
+                                        elem.inBookList?<h3 style={{margin:'0',textAlign:'center',width:'100%',height:'64px',backgroundColor:'rgba(1, 152, 117, 1)',color:'white', position:'relative',borderRadius: '5px'}}>In BookList ✓</h3>:
                                         <>
                                         {/* <Button  onClick={()=>{this.setShow(true, index)}}>
                                         ADD BOOK
                                         </Button> */}
                                         {/* <div class="container addSearchButton"> */}
-                                        <button type='submit'href="https://twitter.com/masuwa1018"  onClick={()=>{this.setShow(true, index)}}class="btn effect01" target="_blank"><span>ADD BOOK</span></button>
+                                        <button style={{position:'relative',width:'100%'}} type='submit'href="https://twitter.com/masuwa1018"  onClick={()=>{this.setShow(true, index)}}class="btn effect01" target="_blank"><span >ADD BOOK</span></button>
                                         {/* </div> */}
                                         {
                                         elem.show && (
@@ -229,10 +251,8 @@ export default class Results extends React.Component{
                                         </Modal.Body>
                                         
                                         <Modal.Footer>
-                                        <div class="container">
-                                             <button type='submit'href="https://twitter.com/masuwa1018" class="btn effect01" target="_blank"><span>ADD</span></button>
+                                             <button style={{width:'100%'}}type='submit'href="https://twitter.com/masuwa1018" class="btn effect01" target="_blank"><span>ADD</span></button>
                 
-                                        </div>
                                         <Button variant="secondary" onClick={()=>{this.setShow(false, index)}}>
                                         Close
                                         </Button>

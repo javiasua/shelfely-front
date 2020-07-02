@@ -1,6 +1,13 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 import { Redirect } from 'react-router-dom';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Popover from 'react-bootstrap/Popover'
+import Card from 'react-bootstrap/Card'
+import axios from 'axios'
+import config from '../config'
+import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table'
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css'
 
 
 export default class BookList extends React.Component{
@@ -20,6 +27,14 @@ export default class BookList extends React.Component{
         })
     }
 
+    handleReadDropDown2=()=>{
+        let booksRead = this.props.books.filter((elem)=>elem.alreadyRead)
+        this.setState({
+            books : booksRead,
+            allBooks : false,
+        })
+    }
+
     handleToReadDropDown=()=>{
         let booksNotRead = this.props.books.filter((elem)=>!elem.alreadyRead)
         this.setState({
@@ -29,20 +44,58 @@ export default class BookList extends React.Component{
         })
     }
 
+    handleToReadDropDown2=()=>{
+        let booksNotRead = this.props.books.filter((elem)=>!elem.alreadyRead)
+        this.setState({
+            books : booksNotRead,
+            allBooks : false,
+        })
+    }
+
+
     handleAllBooks=()=>{
         this.setState({
             allBooks : true,
             filterBy : 'All Books'
         })
     }
+    handleBookshelf=(title1)=>{
+        let newBooks = [...this.props.books]
+        let index = newBooks.findIndex((book)=>{
+            return title1 === book.title
+        })
+        newBooks[index].alreadyRead = !newBooks[index].alreadyRead
+        let {title,author,date,description,alreadyRead} = newBooks[index]
+        this.setState({
+            books : newBooks
+        })
+        axios.patch(`${config.API_URL}/books/${newBooks[index]._id}`,{ title:title,author:author,date:date,description:description,alreadyRead : alreadyRead
+        })
+            .then((res)=>{
+                console.log(res)
+            })
+        if(!this.state.allBooks){
+            this.handleFilterBy(newBooks[index])
+        
+        }
+    }
+
+    handleFilterBy=(book)=>{
+        if(book.alreadyRead){
+            this.handleToReadDropDown2()
+        }else{
+            this.handleReadDropDown()
+        }
+    }
 
     render(){
-        console.log(this.props.books)
-        console.log(this.state.books)
         if(!this.props.loggedInUser){
             return(
                 <>
-                <h1 style={{color:'white',textAlign:'center',margin:'50px',padding:'20px'}}className='myDetail'>Please sign in to start using Shelfely</h1>
+                
+                <h1 style={{color:'white', fontFamily: 'Kameron' ,textAlign:'center',margin:'50px',padding:'20px'}}className='myDetail'>Shelfely is both a virtual library and bookshelf.</h1>
+                <h1 style={{color:'white', fontFamily: 'Kameron' ,textAlign:'center',margin:'50px',padding:'20px'}}className='myDetail'> With shelfely you will be able to search any book and store it in your shelf!</h1>
+                <h2 style={{color:'white',fontFamily:'Kameron',textAlign:'center',margin:'50px',padding:'20px'}}className='myDetail'>Please sign in to start</h2>
                 </>
             )
         }
@@ -59,55 +112,58 @@ export default class BookList extends React.Component{
                         <button class="dropdown-item" type='submit' onClick={this.handleToReadDropDown} >WishList</button>
                     </div>
                 </div>
-                <table class="table">
-                <thead>
-                    <tr>
-                        <th>Cover</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Published Date</th>
-                        <th>Category</th>
-                        <th>Read</th>
-                    </tr>
-                </thead>
+                <Table >
+                <Thead>
+                    <Tr>
+                        <Th>Cover</Th>
+                        <Th>Title</Th>
+                        <Th>Author</Th>
+                        <Th>Published Date</Th>
+                        <Th>Category</Th>
+                        <Th>Read</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
                 {
                     this.props.books.map((book, index)=>{
                         if(book.user === this.props.loggedInUser._id){
                             console.log(typeof(book.date))
                             return (
-                                <tr key = {index}>
-                                    <td>
+                                <Tr key = {index}>
+                                    <Td>
                                     <img style={{width:'100px' ,height:'120px'}} src={book.image}/>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <Link to={`/book/${book._id}`}class="card-text"><h3>{book.title}</h3></Link>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <h2>{book.author}</h2>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                         <h2>{book.date}</h2>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <h2>{book.category}</h2>
-                                    </td>
+                                    </Td>
                                     {
                                         book.alreadyRead ? 
-                                        <td>
-                                            <h4>✅</h4>
-                                        </td>
+                                        <Td>
+                                        <button onClick={()=>{this.handleBookshelf(book.title)}} style={{padding:'0',border:'none',backgroundColor:'rgba(135, 154, 179, 0.97)'}}><h4 style={{fontSize:'45px',padding:'10px'}}className='read'>✅ </h4></button>
+                                        </Td>
                                         :
-                                        <td>
-                                            <h4><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4>
-                                        </td>
+                                        <Td>
+                                        <button onClick={()=>{this.handleBookshelf(book.title)}} style={{padding:'0',border:'none',backgroundColor:'rgba(135, 154, 179, 0.97)'}}><h4 className='read'><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4></button>
+                                        </Td>
                                     }
-                                </tr>
+                                </Tr>
                             )
                         }
                     }
                     )
                 }
-                </table>
+                </Tbody>
+                </Table>
+
 
                 </>
             )
@@ -127,54 +183,57 @@ export default class BookList extends React.Component{
                     </div>
 
                 </div>
-                <table class="table">
-                <thead>
-                    <tr>
-                        <th>Cover</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Published Date</th>
-                        <th>Category</th>
-                        <th>Read</th>
-                    </tr>
-                </thead>
+                <Table >
+                <Thead>
+                    <Tr>
+                        <Th>Cover</Th>
+                        <Th>Title</Th>
+                        <Th>Author</Th>
+                        <Th>Published Date</Th>
+                        <Th>Category</Th>
+                        <Th>Read</Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
                 {
                     this.state.books.map((book, index)=>{
                         if(book.user === this.props.loggedInUser._id){
                             return (
-                                <tr key = {index}>
-                                    <td>
+                                <Tr key = {index}>
+                                    <Td>
                                     <img style={{width:'140px' ,height:'170px'}} src={book.image}/>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <Link to={`/book/${book._id}`}class="card-text"><h3>{book.title}</h3></Link>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <h2>{book.author}</h2>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <h2>{book.date}</h2>
-                                    </td>
-                                    <td>
+                                    </Td>
+                                    <Td>
                                     <h2>{book.category}</h2>
-                                    </td>
+                                    </Td>
                                     {
                                         book.alreadyRead ? 
-                                        <td>
-                                            <h4>✅</h4>
-                                        </td>
+                                        <Td>
+                                        <button onClick={()=>{this.handleBookshelf(book.title)}} style={{padding:'0',border:'none',backgroundColor:'rgba(135, 154, 179, 0.97)'}}><h4 style={{fontSize:'45px',padding:'10px'}}className='read'>✅ </h4></button>
+                                        </Td>
                                         :
-                                        <td>
-                                            <h4><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4>
-                                        </td>
+                                        <Td>
+                                        <button onClick={()=>{this.handleBookshelf(book.title)}} style={{padding:'0',border:'none',backgroundColor:'rgba(135, 154, 179, 0.97)'}}><h4 className='read'><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4></button>
+                                        </Td>
+                                    
                                     }
-                                </tr>
+                                </Tr>
                             )
                         }
                     }
                     )
                 }
-                </table>
+                </Tbody>
+                </Table>
             </>
         )
     }

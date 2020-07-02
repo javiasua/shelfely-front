@@ -4,7 +4,7 @@ import '../App.css'
 import {Link} from 'react-router-dom'
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import API_URL from '../config'
+import config from '../config'
 
 
 export default class BookDetail extends Component{
@@ -15,7 +15,7 @@ export default class BookDetail extends Component{
     }
     componentDidMount(){
         let id = this.props.match.params.id
-        axios.get(`${API_URL}/books/${id}`)
+        axios.get(`${config.API_URL}/books/${id}`)
             .then((res)=>{
                 let bookToShow = res.data
                 bookToShow.date = bookToShow.date.substring(0,10)
@@ -31,7 +31,7 @@ export default class BookDetail extends Component{
 
     handleDeletebook=()=>{
         let id = this.props.match.params.id
-        axios.delete(`${API_URL}/books/${id}`)
+        axios.delete(`${config.API_URL}/books/${id}`)
             .then((res)=>{
                 console.log('deleted')
                 this.props.afterDelete(id)
@@ -63,28 +63,31 @@ export default class BookDetail extends Component{
         return (
             <>
                 <div className='myDetail book-detail'>
-                    <img style={{width:'300px',height:'400px',border:'2px solid black',borderRadius :'5px'}}src={this.state.book.image}/>
-                    <div>
+                    <img style={{position:'relative',width:'21.5rem',height:'100%',borderRadius :'5px'}}src={this.state.book.image}/>
+                    
+                    <div className='book-detail-components'>
                     <h1> {this.state.book.title}</h1>
                     <br/>
                     <h2> {this.state.book.author}</h2>
-                    <h3>Date Published : {this.state.book.date}</h3>
-                    <h4>Category: {this.state.book.category}</h4>
+                    <h3>{this.state.book.date}</h3>
+                    <h4>{this.state.book.category}</h4>
                     {
                         this.state.book.alreadyRead ? 
-                           <h4 style={{color:'green'}}>Book already read</h4>
+                           <h4 style={{color:'green',fontSize:'45px'}}> ✅</h4>
                         :
-                            <h4 style={{color:'brown'}}>You haven't read this book yet</h4>
+                            <h4 style={{color:'brown'}}><img style={{width:'75px', height:'75px'}} src='https://cdn.pixabay.com/photo/2016/05/31/10/52/not-yet-1426593_960_720.png'></img></h4>
                     }
+                    <br>
+                    </br>
+                    <br>
+                    </br>
                     {
-                        this.state.book.preview? <a target="_blank" style={{ color:'white'}} href={this.state.book.preview}><h3>PREVIEW</h3></a> : <h3>NO PREVIEW AVALIABLE</h3>
+                        this.state.book.preview? <a target="_blank" style={{color:'white'}} href={this.state.book.preview}><button  type='submit' style={{position:'relative',width:'70%'}}href="https://twitter.com/masuwa1018"  class="btn effect01" target="_blank">PREVIEW</button></a> : <h3>NO PREVIEW AVALIABLE</h3>
                     }
-                     <div class="container">
-                    <button onClick={()=>{this.handleDescription(true)}} style={{height:'100px',width:'130px'}}type='submit'href="https://twitter.com/masuwa1018"  class="btn effect01" target="_blank"><span style={{fontSize:'13px'}}>Show Description</span></button>
-                    </div>
-                    {/* <button onClick={()=>{this.handleDescription(true)}}>Show Description</button> */}
+                    <a><button style={{position:'relative',width:'70%'}} onClick={()=>{this.handleDescription(true)}} type='submit'href="https://twitter.com/masuwa1018"  class="btn effect01" target="_blank">Description</button></a>
                                     {
                                         this.state.showDescription ? 
+                                        <>
                                         <Modal show={this.state.showDescription} onHide={()=>{this.handleDescription(false)}}>
                                         <Modal.Header  closeButton>
                                         <Modal.Title style={{fontFamily:'Kameron'}}>{this.state.book.title} </Modal.Title>
@@ -96,14 +99,14 @@ export default class BookDetail extends Component{
         
                                         </Modal.Footer>
                                         </Modal> 
+                                        </>
                                         :''
                                     }
-                    <div class="container">
-                    <Link to={`/book/${id}/edit`}><button  style={{width:'100px'}}type='submit'href="https://twitter.com/masuwa1018"  class="btn effect01" target="_blank"><span>Edit</span></button></Link>
+                   
+                    <Link to={`/book/${id}/edit`} style={{margin:'0'}}><button style={{position:'relative',width:'70%'}} type='submit'href="https://twitter.com/masuwa1018"  class="btn effect01" target="_blank">Edit</button></Link>
+                    <a><button style={{position:'relative',width:'70%'}}onClick={this.handleDeletebook} style={{backgroundColor : 'brown',color:'white'}}>Delete</button></a>
                     </div>
-                    <button onClick={this.handleDeletebook} style={{margin:'3px',backgroundColor : 'brown',color:'white'}}>Delete</button>
-                    </div>
-                    <img style={{width:'300px',height:'400px',border:'2px solid black',borderRadius :'5px'}}src={this.state.book.image}/>
+                    <img style={{position:'relative',height:'100%',width:'21.5rem',borderRadius :'5px'}}src={this.state.book.image}/>
                 </div>
 
             </>

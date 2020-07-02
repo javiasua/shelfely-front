@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import {Redirect} from 'react-router-dom'
-import API_URL from '../config'
+import config from '../config'
 export default class EditBook extends React.Component{
 
     state = {
@@ -10,7 +10,7 @@ export default class EditBook extends React.Component{
 
     componentDidMount(){
         let id = this.props.match.params.id
-        axios.get(`${API_URL}/books/${id}`)
+        axios.get(`${config.API_URL}/books/${id}`)
             .then((res)=>{
                 console.log(res.data)
                 let bookToEdit = res.data
@@ -24,10 +24,10 @@ export default class EditBook extends React.Component{
     handleEdit=(e)=>{
         e.preventDefault()
         let id = this.props.match.params.id
-        let {title,author,date,description} = this.state.book
+        let {title,author,date,description,alreadyRead} = this.state.book
         console.log(description)
-        let properties = {title:title,author:author,date:date,description:description}
-        axios.patch(`${API_URL}/books/${id}`,{
+        let properties = {title:title,author:author,date:date,description:description,alreadyRead:alreadyRead}
+        axios.patch(`${config.API_URL}/books/${id}`,{
             title : title,
             author : author,
             date : date,
