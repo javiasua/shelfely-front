@@ -22,7 +22,9 @@ class App extends React.Component{
   state = {
     books : [],
     bookSearched : [],
-    loggedInUser: null
+    loggedInUser: null,
+    signupErrorMessage : '',
+    SignInErrorMessage : ''
   }
 
   getBooks = () => {
@@ -89,6 +91,11 @@ class App extends React.Component{
         this.props.history.push('/')
       })
     })
+    .catch((res)=>{
+      this.setState({
+        SignInErrorMessage : res.response.data.error
+      })
+    })
   }
 
   handleSignUp = (e) => {
@@ -102,6 +109,7 @@ class App extends React.Component{
       password: password
     }, { withCredentials: true})
     .then((res) => {
+        console.log(res)
         this.setState({
           loggedInUser: res.data
         }, () => {
@@ -109,7 +117,9 @@ class App extends React.Component{
         })
     })
     .catch((err)=>{
-      console.log(err)
+      this.setState({
+        signupErrorMessage:err.response.data.errorMessage
+      })
     })
   }
 
@@ -134,9 +144,9 @@ class App extends React.Component{
     let author = e.target.author.value
     let date = e.target.date.value
     let image = e.target.image.files[0]
+    console.log('image is', image)
     let uploadData = new FormData();
     uploadData.append('imageUrl', image)
-    console.log(image)
     let description= e.target.description.value
     let category = e.target.category.value
     let alreadyRead = e.target.yes.value==='yes'? true : false
@@ -276,6 +286,8 @@ class App extends React.Component{
 
             <Route path="/sign-in" render={(routeProps) => {
                   return <SignIn 
+                    errorMessage = {this.state.SignInErrorMessage}
+                    
                     onSignIn={this.handleSignIn} 
                     {...routeProps} 
                   />
@@ -283,7 +295,7 @@ class App extends React.Component{
             />
 
             <Route path="/sign-up" render={(routeProps) => {
-              return <SignUp onSignUp={this.handleSignUp} {...routeProps} />
+              return <SignUp errorMessage={this.state.signupErrorMessage} onSignUp={this.handleSignUp} {...routeProps} />
             }}
             />
 

@@ -15,9 +15,11 @@ export default function SignUp(props){
             </div>
             <div className="form-group">
                 <label htmlFor="exampleInputPassword1">Password</label>
-                <input name="password" type="text" className="form-control" id="exampleInputPassword1" />
+                <input name="password" type="password" className="form-control" id="exampleInputPassword1" />
             </div>
+            <h5 style={{color:'brown'}}>{props.errorMessage}</h5>
             <button  type='submit' style={{position:'relative'}}href="https://twitter.com/masuwa1018"  class="btn effect01" target="_blank">Sign Up</button>
+            
         </form>
         </div>
         
